@@ -37,7 +37,7 @@ Subscriptions.prototype.getCollection = function(cb) {
             console.log("subscriptions collection doesn't exist, creating");
             subThis.dummySubscriptions(cb);
         } else {
-            console.log("subscriptions does exist");
+            console.log("subscriptions collection does exist");
             cb(null, coll);
         }
     })
@@ -109,6 +109,7 @@ Subscriptions.prototype.insertNotifyURL = function(phone, record, cb) {
 
 Subscriptions.prototype.processNotifications = function(xmlData, cb) {
     console.log("processing notifications");
+    console.log(xmlData);
 
     var subThis = this, attrs = {};
 
@@ -137,40 +138,46 @@ Subscriptions.prototype.processNotifications = function(xmlData, cb) {
                 if (err) {
                     cb(err);
                 } else {
-                    item.notifyURL.forEach(function(rec) {
-                        var itemString = JSON.stringify(attrs);
 
-                        var headers = {
-                            'Content-Type': 'application/json',
-                            'Content-Length': itemString.length
-                        };
+                    if (item != null) {
+                        console.log("item is not null");
+                        item.notifyURL.forEach(function(rec) {
+                            var itemString = JSON.stringify(attrs);
 
-                        var options = url.parse(rec.url);
-                        options['method'] = 'POST';
+                            var headers = {
+                                'Content-Type': 'application/json',
+                                'Content-Length': itemString.length
+                            };
 
-                        var req = http.request(options, function(res) {
-                            res.setEncoding('utf-8');
+                            var options = url.parse(rec.url);
+                            options['method'] = 'POST';
 
-                            var responseString = '';
+                            var req = http.request(options, function(res) {
+                                res.setEncoding('utf-8');
 
-                            res.on('data', function(data) {
-                                responseString += data;
+                                var responseString = '';
+
+                                res.on('data', function(data) {
+                                    responseString += data;
+                                });
+
+                                res.on('end', function() {
+                                    cb(null, responseString);
+                                });
                             });
 
-                            res.on('end', function() {
-                                cb(null, responseString);
+                            req.on('error', function(e) {
+                                console.log("error: post request to " + rec.url + " failed");
+                                cb(null);
                             });
-                        });
 
-                        req.on('error', function(e) {
-                            console.log("error: post request to " + rec.url + " failed");
-                            cb(null);
+                            console.log("posting to " + rec.url);
+                            req.write(itemString);
+                            req.end();
                         });
-                        
-                        console.log("posting to " + rec.url);
-                        req.write(itemString);
-                        req.end();
-                    });
+                    } else {
+                        cb(null);
+                    }
                 }
             });
         }

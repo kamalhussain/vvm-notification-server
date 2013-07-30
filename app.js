@@ -99,12 +99,23 @@ app.post('/notify', function(req, res) {
 
     req.on('end', function() {
         sub.processNotifications(content, function(err, item) {
-            if (err) {
-                console.log("error processing a notification");
-                res.send({"error": "notifications failed"});
-            } else {
-                res.send(item);
-            }
+            //just send common response.
+
+            fs.readFile('./success-response.xml', 'utf8', function(err, data) {
+                if (err) {
+                    console.log(err);
+
+                } else {
+                    res.send(data);
+                }
+
+//            if (err) {
+//                console.log("error processing a notification");
+//                res.send({"error": "notifications failed"});
+//            } else {
+//                res.send(item);
+//            }
+            });
         });
     });
 });
