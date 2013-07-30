@@ -1,10 +1,9 @@
 var Db = require('mongodb').Db,
         Connection = require('mongodb').Connection,
-        Server = require('mongodb').Server;
-
-var parseString = require('xml2js').parseString;
-var http = require('http');
-var url = require("url");
+        Server = require('mongodb').Server,
+        parseString = require('xml2js').parseString,
+        http = require('http'),
+        url = require("url");
 
 var host = "localhost",
         port = 27017;
@@ -26,8 +25,6 @@ Subscriptions = function() {
     this.db.open(function() {
     });
 }
-
-
 
 Subscriptions.prototype.getCollection = function(cb) {
     var subThis = this;
@@ -109,7 +106,6 @@ Subscriptions.prototype.insertNotifyURL = function(phone, record, cb) {
 
 Subscriptions.prototype.processNotifications = function(xmlData, cb) {
     console.log("processing notifications");
-    console.log(xmlData);
 
     var subThis = this, attrs = {};
 
@@ -183,7 +179,6 @@ Subscriptions.prototype.processNotifications = function(xmlData, cb) {
         }
     });
 };
-
 
 Subscriptions.prototype.dummySubscriptions = function(cb) {
     console.log("creating dummy subcriptions for testing");

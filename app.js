@@ -107,6 +107,8 @@ app.post('/notify', function(req, res) {
                     console.log(err);
 
                 } else {
+                    res.setHeader('Content-Type', 'text/xml');
+                    res.setHeader('Content-Length', data.length);
                     res.send(data);
                 }
 
