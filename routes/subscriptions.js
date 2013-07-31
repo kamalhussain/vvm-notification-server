@@ -3,7 +3,8 @@ var Db = require('mongodb').Db,
         Server = require('mongodb').Server,
         parseString = require('xml2js').parseString,
         http = require('http'),
-        url = require("url");
+        url = require("url"),
+        crypto = require('crypto');
 
 var host = "localhost",
         port = 27017;
@@ -108,6 +109,7 @@ Subscriptions.prototype.processNotifications = function(xmlData, cb) {
     console.log("processing notifications");
 
     var subThis = this, attrs = {};
+    var login, password;
 
     parseString(xmlData, function(err, result) {
         if (err) {
@@ -121,61 +123,81 @@ Subscriptions.prototype.processNotifications = function(xmlData, cb) {
                                 attrs[item.attributeName] = item.value;
                             });
                         });
+
+                        item['wsc:clientSecuritySegment'].forEach(function(item) {
+                            login = item['applicationID'][0];
+                            password = item['applicationPasscode'][0];
+                        });
                     });
                 });
             });
 
-            var phone = attrs['mboxNumber'][0];
+            var shasum, passwordHash;
+        
+            if (password != null) {
+                shasum = crypto.createHash('sha1');
+                shasum.update("myvoice2013");
+                passwordHash = shasum.digest('hex');
+            }
 
-            //TODO there might be some rework required here to get the status message from each
-            //call. Looks like we are over-writing the request object
-            //TODO do research on how to do send parallel or serial requests to multiple endpoints
-            subThis.findByPhone(phone, function(err, item) {
-                if (err) {
-                    cb(err);
-                } else {
+            if ((login !== "mab") || (password !== passwordHash)) {
+                console.log("login or password doesn't match");
+                cb("<status>Invalid login</status>");
+                
+            } else {
 
-                    if (item != null) {
-                        console.log("item is not null");
-                        item.notifyURL.forEach(function(rec) {
-                            var itemString = JSON.stringify(attrs);
+                var phone = attrs['mboxNumber'][0];
 
-                            var headers = {
-                                'Content-Type': 'application/json',
-                                'Content-Length': itemString.length
-                            };
-
-                            var options = url.parse(rec.url);
-                            options['method'] = 'POST';
-
-                            var req = http.request(options, function(res) {
-                                res.setEncoding('utf-8');
-
-                                var responseString = '';
-
-                                res.on('data', function(data) {
-                                    responseString += data;
-                                });
-
-                                res.on('end', function() {
-                                    cb(null, responseString);
-                                });
-                            });
-
-                            req.on('error', function(e) {
-                                console.log("error: post request to " + rec.url + " failed");
-                                cb(null);
-                            });
-
-                            console.log("posting to " + rec.url);
-                            req.write(itemString);
-                            req.end();
-                        });
+                //TODO there might be some rework required here to get the status message from each
+                //call. Looks like we are over-writing the request object
+                //TODO do research on how to do send parallel or serial requests to multiple endpoints
+                subThis.findByPhone(phone, function(err, item) {
+                    if (err) {
+                        cb(err);
                     } else {
-                        cb(null);
+
+                        if (item != null) {
+                            console.log("item is not null");
+                            item.notifyURL.forEach(function(rec) {
+                                var itemString = JSON.stringify(attrs);
+
+                                var headers = {
+                                    'Content-Type': 'application/json',
+                                    'Content-Length': itemString.length
+                                };
+
+                                var options = url.parse(rec.url);
+                                options['method'] = 'POST';
+
+                                var req = http.request(options, function(res) {
+                                    res.setEncoding('utf-8');
+
+                                    var responseString = '';
+
+                                    res.on('data', function(data) {
+                                        responseString += data;
+                                    });
+
+                                    res.on('end', function() {
+                                        cb(null, responseString);
+                                    });
+                                });
+
+                                req.on('error', function(e) {
+                                    console.log("error: post request to " + rec.url + " failed");
+                                    cb(null);
+                                });
+
+                                console.log("posting to " + rec.url);
+                                req.write(itemString);
+                                req.end();
+                            });
+                        } else {
+                            cb(null);
+                        }
                     }
-                }
-            });
+                });
+            }
         }
     });
 };

@@ -93,24 +93,28 @@ app.post('/subscriptions', function(req, res) {
 
 app.post('/notify', function(req, res) {
     var content = '';
-
+    res.setHeader('Content-Type', 'text/xml');
     req.on('data', function(chunk) {
         content += chunk;
     });
 
     req.on('end', function() {
         sub.processNotifications(content, function(err, item) {
-            //just send common response.
 
-            fs.readFile('./success-response.xml', 'utf8', function(err, data) {
-                if (err) {
-                    console.log(err);
+            if (err) {
+                res.end(err);
+            } else {
+                //just send common response.
 
-                } else {
-                    res.setHeader('Content-Type', 'text/xml');
-                    res.setHeader('Content-Length', data.length);
-                    res.send(data);
-                }
+                fs.readFile('./success-response.xml', 'utf8', function(err, data) {
+                    if (err) {
+                        console.log(err);
+
+                    } else {
+
+                        //res.setHeader('Content-Length', data.length);
+                        res.end(data);
+                    }
 
 //            if (err) {
 //                console.log("error processing a notification");
@@ -118,7 +122,8 @@ app.post('/notify', function(req, res) {
 //            } else {
 //                res.send(item);
 //            }
-            });
+                });
+            }
         });
     });
 });
