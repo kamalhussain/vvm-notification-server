@@ -25,6 +25,8 @@ app.use(app.router);
 app.use(require('stylus').middleware(__dirname + '/public'));
 app.use(express.static(path.join(__dirname, 'public')));
 
+var auth = express.basicAuth('testUser', 'testPass');
+
 // development only
 if ('development' == app.get('env')) {
     app.use(express.errorHandler());
@@ -45,7 +47,7 @@ function checkURL(value) {
 /**
  * Get subscription information for a phone number
  */
-app.get('/subscriptions/:id', function(req, res) {
+app.get('/subscriptions/:id', auth, function(req, res) {
     sub.findByPhone(req.params.id, function(err, item) {
         if (err) {
             console.log("error: cannot find subscription for phone " + req.params.id);
@@ -60,7 +62,7 @@ app.get('/subscriptions/:id', function(req, res) {
     });
 });
 
-app.get('/subscriptions', function(req, res) {
+app.get('/subscriptions', auth, function(req, res) {
     sub.findAll(function(err, items) {
         if (err) {
             console.log("error: cannot get subscriptions");
@@ -71,7 +73,7 @@ app.get('/subscriptions', function(req, res) {
     });
 });
 
-app.post('/subscriptions', function(req, res) {
+app.post('/subscriptions', auth, function(req, res) {
     console.log(req.body);
 
     res.setHeader('Content-Type', 'application/json');
