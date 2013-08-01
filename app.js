@@ -74,6 +74,8 @@ app.get('/subscriptions', function(req, res) {
 app.post('/subscriptions', function(req, res) {
     console.log(req.body);
 
+    res.setHeader('Content-Type', 'application/json');
+    
     if (!checkURL(req.body.notifyURL)) {
         res.send({"error": "invalid URL specified"});
         return;
@@ -87,7 +89,7 @@ app.post('/subscriptions', function(req, res) {
         if (err)
             console.log("error inserting a record");
         else
-            res.send(item);
+            res.send({"status" : "subscription added"});
     });
 });
 

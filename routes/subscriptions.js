@@ -141,7 +141,7 @@ Subscriptions.prototype.processNotifications = function(xmlData, cb) {
             }
 
             if ((login !== "mab") || (password !== passwordHash)) {
-                console.log("login or password doesn't match");
+                console.log("login or password doesn't match. login: " + login + ", password: " + password);
                 cb("<status>Invalid login</status>");
                 
             } else {
