@@ -62,6 +62,21 @@ app.get('/subscriptions/:id', auth, function(req, res) {
     });
 });
 
+/**
+ * Delete subscription information for a phone number
+ */
+app.delete('/subscriptions/:id', auth, function(req, res) {
+    sub.deleteByPhone(req.params.id, function(err, item) {
+        if (err) {
+            console.log("error: cannot find subscription for phone " + req.params.id);
+            res.jsonp({"error": "cannot get subscrption information"});
+        } else {
+            res.jsonp({"status": "subscriptions deleted"});
+        }
+    });
+});
+
+
 app.get('/subscriptions', auth, function(req, res) {
     sub.findAll(function(err, items) {
         if (err) {
@@ -77,7 +92,7 @@ app.post('/subscriptions', auth, function(req, res) {
     console.log(req.body);
 
     res.setHeader('Content-Type', 'application/json');
-    
+
     if (!checkURL(req.body.notifyURL)) {
         res.send({"error": "invalid URL specified"});
         return;
@@ -91,7 +106,7 @@ app.post('/subscriptions', auth, function(req, res) {
         if (err)
             console.log("error inserting a record");
         else
-            res.send({"status" : "subscription added"});
+            res.send({"status": "subscription added"});
     });
 });
 

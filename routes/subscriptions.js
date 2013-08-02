@@ -58,6 +58,23 @@ Subscriptions.prototype.findByPhone = function(id, cb) {
     });
 };
 
+Subscriptions.prototype.deleteByPhone = function(id, cb) {
+    console.log("calling deleteByPhone()");
+
+    this.getCollection(function(err, coll) {
+        if (err) {
+            cb(err);
+        } else {
+            coll.remove({_id: id}, function(err, item) {
+                if (err)
+                    cb(err);
+                else
+                    cb(null, item)
+            });
+        }
+    });
+};
+
 Subscriptions.prototype.findAll = function(cb) {
     console.log("calling findAll");
 
