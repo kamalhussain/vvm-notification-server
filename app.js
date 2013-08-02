@@ -93,7 +93,7 @@ app.get('/subscriptions', auth, function(req, res) {
     });
 });
 
-app.post('/subscriptions', auth, function(req, res) {
+app.post('/subscriptions/:id', auth, function(req, res) {
     console.log(req.body);
 
     res.setHeader('Content-Type', 'application/json');
@@ -103,7 +103,7 @@ app.post('/subscriptions', auth, function(req, res) {
         return;
     }
 
-    sub.insertNotifyURL(req.body.phone, {
+    sub.insertNotifyURL(req.params.id, {
         url: req.body.notifyURL,
         created_at: new Date()
     },
