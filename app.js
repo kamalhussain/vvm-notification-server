@@ -130,7 +130,7 @@ app.post('/notify', function(req, res) {
             } else {
                 //just send common response.
 
-                fs.readFile('./success-response.xml', 'utf8', function(err, data) {
+                fs.readFile(__dirname + '/success-response.xml', 'utf8', function(err, data) {
                     if (err) {
                         console.log(err);
 
