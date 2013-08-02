@@ -25,7 +25,12 @@ app.use(app.router);
 app.use(require('stylus').middleware(__dirname + '/public'));
 app.use(express.static(path.join(__dirname, 'public')));
 
-var auth = express.basicAuth('testUser', 'testPass');
+crypto = require('crypto');
+shasum = crypto.createHash('sha1');
+shasum.update("myvoice2013");
+passwordHash = shasum.digest('hex');
+
+var auth = express.basicAuth('vmUser', passwordHash);
 
 // development only
 if ('development' == app.get('env')) {

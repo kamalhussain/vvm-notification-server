@@ -8,6 +8,19 @@ app.get('/test', function(req, res) {
     res.send("test");
 });
 
+app.post('/test', function(req, res) {
+    var content;
+
+    req.on('data', function(chunk) {
+        content += chunk;
+    });
+
+    req.on('end', function() {
+        console.log("here" + content);
+        res.send(content);
+    });
+});
+
 var activeClients = 0;
 
 io.sockets.on('connection', function(socket) {
@@ -15,9 +28,19 @@ io.sockets.on('connection', function(socket) {
 });
 
 function clientConnect(socket) {
-    app.get('/test2', function(req, res) {
-        socket.emit('message', {clients: activeClients, hello: 'world'});
-        res.send("test");
+    app.post('/test2', function(req, res) {
+
+        var content;
+
+        req.on('data', function(chunk) {
+            content += chunk;
+        });
+
+        req.on('end', function() {
+            console.log(content);
+            socket.emit('message', JSON.stringify(content));
+            res.send("test");
+        });
     });
 
     activeClients++;

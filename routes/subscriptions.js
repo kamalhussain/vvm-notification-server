@@ -174,7 +174,8 @@ Subscriptions.prototype.processNotifications = function(xmlData, cb) {
                     } else {
 
                         if (item != null) {
-                            console.log("item is not null");
+                            console.log("posting data" + JSON.stringify(attrs));
+                            
                             item.notifyURL.forEach(function(rec) {
                                 var itemString = JSON.stringify(attrs);
 
