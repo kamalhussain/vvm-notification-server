@@ -186,6 +186,7 @@ Subscriptions.prototype.processNotifications = function(xmlData, cb) {
 
                                 var options = url.parse(rec.url);
                                 options['method'] = 'POST';
+                                options['headers'] = headers;
 
                                 var req = http.request(options, function(res) {
                                     res.setEncoding('utf-8');
