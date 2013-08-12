@@ -4,7 +4,11 @@ var app = require('express')()
 
 server.listen(4000);
 
-app.get('/test', function(req, res) {
+app.post('/test3', function(req, res) {
+    for (var item in req.headers) {
+        console.log(item + ": " + req.headers[item]);
+    }
+
     res.send("test");
 });
 
