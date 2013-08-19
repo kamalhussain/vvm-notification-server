@@ -9,7 +9,7 @@ var express = require('express')
         , path = require('path'),
         fs = require('fs');
 
-var Subscriptions = require('./routes/subscriptions2').Subscriptions;
+var Subscriptions = require('./routes/subscriptions').Subscriptions;
 
 var app = express();
 
@@ -67,31 +67,16 @@ app.get('/subscriptions/:id', auth, function(req, res) {
     });
 });
 
-function checkObjectId(str) {
-    var checkForHexRegExp = new RegExp("^[0-9a-fA-F]{24}$");
-    
-    if (checkForHexRegExp.test(str))
-        return 1;
-    
-    return 0;
-}
-
 /**
  * Delete subscription information for a phone number
  */
 app.delete('/subscriptions/:id', auth, function(req, res) {
-    //sub.deleteByPhone(req.params.id, function(err, item) {
-    if (!checkObjectId(req.params.id)) {
-       res.jsonp({"error": "invalid subscription id"});
-       return;
-    };
-    
-    sub.deleteBySubId(req.params.id, function(err, item) {
+    sub.deleteByPhone(req.params.id, function(err, item) {
         if (err) {
             console.log("error: cannot find subscription for phone " + req.params.id);
             res.jsonp({"error": "cannot get subscrption information"});
         } else {
-            res.jsonp({"status": "subscription deleted"});
+            res.jsonp({"status": "subscriptions deleted"});
         }
     });
 });
@@ -119,7 +104,6 @@ app.post('/subscriptions/:id', auth, function(req, res) {
     }
 
     sub.insertNotifyURL(req.params.id, {
-        phoneNumber: req.params.id,
         url: req.body.notifyURL,
         created_at: new Date()
     },
@@ -127,7 +111,7 @@ app.post('/subscriptions/:id', auth, function(req, res) {
         if (err)
             console.log("error inserting a record");
         else
-            res.send(item);
+            res.send({"status": "subscription added"});
     });
 });
 
@@ -179,6 +163,7 @@ app.get('/test11/:id', function(req, res) {
     });
 }
 );
+
 
 app.post('/test100', function(req, res) {
     console.log("test100");
