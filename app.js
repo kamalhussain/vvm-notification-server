@@ -40,7 +40,7 @@ if ('development' == app.get('env')) {
 var sub = new Subscriptions();
 
 function checkURL(value) {
-    var urlregex = new RegExp("^(http:\/\/www.|https:\/\/www.|ftp:\/\/www.|www.|http:\/\/){1}([0-9A-Za-z]+\.)");
+    var urlregex = new RegExp("^(http:\/\/www.|https:\/\/www.|ftp:\/\/www.|www.|http:\/\/|https:\/\/){1}([0-9A-Za-z]+\.)");
 
     if (urlregex.test(value)) {
         return (true);
