@@ -6,8 +6,9 @@ var express = require('express')
         , routes = require('./routes')
         //, user = require('./routes/user')
         , http = require('http')
-        , path = require('path'),
-        fs = require('fs');
+        , path = require('path')
+        , url = require('url')
+        , fs = require('fs');
 
 var Subscriptions = require('./routes/subscriptions2').Subscriptions;
 

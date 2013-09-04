@@ -252,19 +252,38 @@ Subscriptions.prototype.processNotifications = function(xmlData, cb) {
                                 options['method'] = 'POST';
                                 options['headers'] = headers;
 
-                                var req = http.request(options, function(res) {
-                                    res.setEncoding('utf-8');
+                                var req;
 
-                                    var responseString = '';
+                                if (options.protocol == "http") {
+                                    req = http.request(options, function(res) {
+                                        res.setEncoding('utf-8');
 
-                                    res.on('data', function(data) {
-                                        responseString += data;
+                                        var responseString = '';
+
+                                        res.on('data', function(data) {
+                                            responseString += data;
+                                        });
+
+                                        res.on('end', function() {
+                                            cb(null, responseString);
+                                        });
                                     });
 
-                                    res.on('end', function() {
-                                        cb(null, responseString);
+                                } else {
+                                    req = https.request(options, function(res) {
+                                        res.setEncoding('utf-8');
+
+                                        var responseString = '';
+
+                                        res.on('data', function(data) {
+                                            responseString += data;
+                                        });
+
+                                        res.on('end', function() {
+                                            cb(null, responseString);
+                                        });
                                     });
-                                });
+                                }
 
                                 req.on('error', function(e) {
                                     console.log("error: post request to " + item.url + " failed");
@@ -290,9 +309,9 @@ Subscriptions.prototype.dummySubscriptions = function(cb) {
     console.log("creating dummy subcriptions for testing");
 
     var subscriptions = [
-        {"_id": "1111111111", "notifyURL": [{"url": "www.nofiyme", "added": "today"}]},
-        {"_id": "2222222222", "notifyURL": [{"url": "www.nofiyme", "added": "today"}]},
-        {"_id": "3333333333", "notifyURL": [{"url": "www.nofiyme", "added": "today"}]}
+        {"phoneNumber": "1111111111", "url": "www.nofiy.me", "created_at": "today"},
+        {"phoneNumber": "2222222222", "url": "www.nofiy2.me", "created_at": "today"},
+        {"phoneNumber": "3333333333", "url": "www.nofiy3.me", "created_at": "today"}
     ];
 
     this.db.collection("subscriptions2", function(err, coll) {
