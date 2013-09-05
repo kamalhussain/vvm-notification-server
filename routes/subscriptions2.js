@@ -254,7 +254,7 @@ Subscriptions.prototype.processNotifications = function(xmlData, cb) {
 
                                 var req;
 
-                                if (options.protocol == "http") {
+                                if (options.protocol == "http:") {
                                     req = http.request(options, function(res) {
                                         res.setEncoding('utf-8');
 
